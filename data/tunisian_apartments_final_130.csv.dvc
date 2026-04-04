@@ -1,0 +1,5 @@
+outs:
+- md5: 6447ccda0bbd157e7873ac09275e25f6
+  size: 618218
+  hash: md5
+  path: tunisian_apartments_final_130.csv

@@ -1,0 +1,80 @@
+schema: '2.0'
+stages:
+  process_and_train:
+    cmd: python pipeline/run_notebooks.py
+    deps:
+    - path: data/tunisian_apartments_geo_final_130.csv
+      hash: md5
+      md5: 1b75c06f754f1ff966bd7d6a43477c6a
+      size: 863196
+      isexec: true
+    - path: notebooks/01_EDA.ipynb
+      hash: md5
+      md5: bb76af2031c39e27d866fa88d5af383d
+      size: 2386618
+      isexec: true
+    - path: notebooks/02_Modeling.ipynb
+      hash: md5
+      md5: 4eba8954251b616b6b4ce29bdb1ea80c
+      size: 1345946
+      isexec: true
+    - path: pipeline/run_notebooks.py
+      hash: md5
+      md5: 5a5413eae705452c401aa336a1362bd3
+      size: 8944
+      isexec: true
+    outs:
+    - path: data/X_test.pkl
+      hash: md5
+      md5: de6e3c1f97ec454f97a7b22ad310c643
+      size: 455012
+    - path: data/X_train.pkl
+      hash: md5
+      md5: 1062f6cba187d34075cb5c88fc2b6a26
+      size: 1787696
+    - path: data/feature_columns.pkl
+      hash: md5
+      md5: ce8e6cd4c34b27b5ffd9d24a9adc97da
+      size: 9053
+    - path: data/latest_model.pkl
+      hash: md5
+      md5: 15ddd22b4417e0302d039cf7f3f106cc
+      size: 12572
+    - path: data/metrics.json
+      hash: md5
+      md5: 4b1af4a5f1125fddb2ef74693d73b789
+      size: 115
+    - path: data/y_test.pkl
+      hash: md5
+      md5: ca2df3283874413f131eaf11f71eca23
+      size: 17851
+    - path: data/y_train.pkl
+      hash: md5
+      md5: f54ef42a30ad619af186a1880472a582
+      size: 69364
+  evaluate_and_register:
+    cmd: python pipeline/report.py && python pipeline/model_registry.py
+    deps:
+    - path: data/metrics.json
+      hash: md5
+      md5: 4b1af4a5f1125fddb2ef74693d73b789
+      size: 115
+    - path: pipeline/model_registry.py
+      hash: md5
+      md5: 744cda1d2bed77196059f74efbf0076e
+      size: 7950
+      isexec: true
+    - path: pipeline/report.py
+      hash: md5
+      md5: ac8e5daee80fccd53ad6629398c6f0f1
+      size: 6685
+      isexec: true
+    outs:
+    - path: data/best_model.pkl
+      hash: md5
+      md5: 099e1d4abd93495fb8511b1e41b4638a
+      size: 145778
+    - path: data/run_log.csv
+      hash: md5
+      md5: 26d5748610e7fe0c665e6ddc376dc3eb
+      size: 184

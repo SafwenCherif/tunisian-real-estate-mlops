@@ -1,0 +1,36 @@
+stages:
+  # STAGE 1: Data Processing & Feature Engineering
+  # DVC watches the geo dataset and the notebooks. 
+  # If new rows are added by the scraper, DVC triggers this automatically.
+  process_and_train:
+    cmd: python pipeline/run_notebooks.py
+    deps:
+      - data/tunisian_apartments_geo_final_130.csv
+      - notebooks/01_EDA.ipynb
+      - notebooks/02_Modeling.ipynb
+      - pipeline/run_notebooks.py
+    outs:
+      # Intermediate artifacts
+      - data/X_train.pkl
+      - data/X_test.pkl
+      - data/y_train.pkl
+      - data/y_test.pkl
+      - data/feature_columns.pkl
+      # Final model and metrics
+      - data/latest_model.pkl
+      - data/metrics.json
+
+  # STAGE 2: Evaluation & Promotion (MLflow Integration)
+  # DVC only runs this if the metrics.json changes (meaning a new model was trained)
+  evaluate_and_register:
+    # We run report.py to log it, then model_registry.py to promote to MLflow
+    cmd: python pipeline/report.py && python pipeline/model_registry.py
+    deps:
+      - data/metrics.json
+      - pipeline/report.py
+      - pipeline/model_registry.py
+    outs:
+      # The ongoing historical log
+      - data/run_log.csv
+      # The final champion model for FastAPI
+      - data/best_model.pkl

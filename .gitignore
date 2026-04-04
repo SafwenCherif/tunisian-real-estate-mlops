@@ -1,0 +1,41 @@
+# Environnements virtuels
+tunisian-ai/
+tunisian-ai/Lib/
+__pycache__/
+.ipynb_checkpoints/
+config/
+
+# Fichiers de données et modèles (Gérés par DVC)
+data/*.csv
+data/*.pkl
+data/*.json
+data/*.log
+
+# Fichiers MLflow
+mlruns/
+mlartifacts/
+mlflow.db
+
+# Logs Airflow (bientôt)
+logs/
+.dvc/config.local
+
+.dvc/gdrive_credentials.json
+
+# Fichiers Airflow locaux (si générés hors Docker)
+airflow.db
+airflow.cfg
+webserver_config.py
+airflow-webserver.pid
+
+# Variables d'environnement (Sécurité)
+.env
+
+# Fichiers temporaires DVC
+.dvc/tmp/
+.dvc/cache/
+.dvc/gdrive_credentials.json.bak
+
+
+
+tunisian_apartments_geo_final_130.csv
