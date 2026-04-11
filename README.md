@@ -183,7 +183,7 @@ Ridge Regression consistently outperforms tree ensembles (Random Forest, Gradien
 |---|---|
 | **Data source** | mubawab.tn |
 | **Market** | Tunisian residential real estate (apartments for sale) |
-| **Author** | Safwen Cherif |
+| **Author** | Safwen Cherif & Skander Ben Mohamed|
 | **Status** | Completed (MLOps V2.0) |
 
 > This project is for academic, research, and portfolio purposes. Price predictions are estimates based on public listing data and should not be used as sole financial advice.
