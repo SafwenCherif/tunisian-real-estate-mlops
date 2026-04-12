@@ -5,18 +5,18 @@ stages:
     deps:
     - path: data/tunisian_apartments_geo_final_130.csv
       hash: md5
-      md5: 1b75c06f754f1ff966bd7d6a43477c6a
-      size: 863196
+      md5: c78959dd807e116e088316ce63cf0d0f
+      size: 867935
       isexec: true
     - path: notebooks/01_EDA.ipynb
       hash: md5
-      md5: bb76af2031c39e27d866fa88d5af383d
-      size: 2386618
+      md5: 4d69e6247d89244157c69f1bf2788cbf
+      size: 2393370
       isexec: true
     - path: notebooks/02_Modeling.ipynb
       hash: md5
-      md5: 4eba8954251b616b6b4ce29bdb1ea80c
-      size: 1345946
+      md5: 7206df689597615aac737d644d21555c
+      size: 1337928
       isexec: true
     - path: pipeline/run_notebooks.py
       hash: md5
@@ -26,38 +26,42 @@ stages:
     outs:
     - path: data/X_test.pkl
       hash: md5
-      md5: de6e3c1f97ec454f97a7b22ad310c643
-      size: 455012
+      md5: 635edeac0492083fe16731583029671a
+      size: 457496
     - path: data/X_train.pkl
       hash: md5
-      md5: 1062f6cba187d34075cb5c88fc2b6a26
-      size: 1787696
+      md5: bd2159620052f550f1d8b9f87d4a303c
+      size: 1797011
     - path: data/feature_columns.pkl
       hash: md5
       md5: ce8e6cd4c34b27b5ffd9d24a9adc97da
       size: 9053
     - path: data/latest_model.pkl
       hash: md5
-      md5: 15ddd22b4417e0302d039cf7f3f106cc
+      md5: a48acb9a07e04e7e44334cb9edc3b041
       size: 12572
     - path: data/metrics.json
       hash: md5
-      md5: 4b1af4a5f1125fddb2ef74693d73b789
+      md5: d0c65c940b487e93f6a5954cf0142b48
       size: 115
+    - path: data/scaler.pkl
+      hash: md5
+      md5: e10450d6a4a2324e288c74cd25c69d1b
+      size: 893
     - path: data/y_test.pkl
       hash: md5
-      md5: ca2df3283874413f131eaf11f71eca23
-      size: 17851
+      md5: 0b9d733d89d33867d3d7d8acef050098
+      size: 17947
     - path: data/y_train.pkl
       hash: md5
-      md5: f54ef42a30ad619af186a1880472a582
-      size: 69364
+      md5: dc781568778d783fbb86e8c90b1d25d3
+      size: 69724
   evaluate_and_register:
     cmd: python pipeline/report.py && python pipeline/model_registry.py
     deps:
     - path: data/metrics.json
       hash: md5
-      md5: 4b1af4a5f1125fddb2ef74693d73b789
+      md5: d0c65c940b487e93f6a5954cf0142b48
       size: 115
     - path: pipeline/model_registry.py
       hash: md5
@@ -66,15 +70,15 @@ stages:
       isexec: true
     - path: pipeline/report.py
       hash: md5
-      md5: ac8e5daee80fccd53ad6629398c6f0f1
-      size: 6685
+      md5: e587db91f8205152b05f03bc51d43478
+      size: 6263
       isexec: true
     outs:
     - path: data/best_model.pkl
       hash: md5
-      md5: 099e1d4abd93495fb8511b1e41b4638a
-      size: 145778
+      md5: 2061a811a02ae1dfe6831a794415c8f7
+      size: 145058
     - path: data/run_log.csv
       hash: md5
-      md5: 26d5748610e7fe0c665e6ddc376dc3eb
+      md5: 3e76757270a2609b09477ccb2f2e968c
       size: 184

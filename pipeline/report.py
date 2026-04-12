@@ -4,7 +4,7 @@ pipeline/report.py
 Step 5 of the automated pipeline.
 
 What it does:
-  - Reads the metrics saved by 02_Modeling.ipynb (metrics.json)
+  - Reads the best model metrics directly from the MLflow database
   - Reads dataset sizes from the two CSVs
   - Appends one structured row to data/run_log.csv
 
@@ -13,40 +13,29 @@ run_log.csv schema (one row per pipeline run):
   raw_rows          : total rows in raw CSV after this run
   geo_rows          : total rows in geo CSV after this run
   new_rows_scraped  : rows added by incremental_scrape.py this run
-  best_model        : name of the winning model (e.g. "Ridge (Tuned)")
+  best_model        : name of the winning model
   r2                : R² score on test set
   rmse              : RMSE on log scale
   mae               : MAE on log scale
   avg_error_pct     : (exp(mae) - 1) * 100  — human readable %
   total_runtime_s   : wall clock seconds for the full pipeline run
-
-This log is the project's memory. Over time it shows you:
-  - How the dataset is growing
-  - Whether model accuracy improves as data accumulates
-  - Whether any run produced a regression in performance
-
-Usage (standalone):
-  python pipeline/report.py
-
-Usage (from scheduler):
-  from pipeline.report import write_run_report
-  write_run_report(new_rows=42, total_runtime_s=3600)
 """
 
 import csv
-import json
 import os
-import math
 from datetime import datetime
 
 # ── Path constants ──────────────────────────────────────────────────────────────
 ROOT_DIR     = os.path.join(os.path.dirname(__file__), "..")
 RAW_CSV      = os.path.join(ROOT_DIR, "data", "tunisian_apartments_final_130.csv")
 GEO_CSV      = os.path.join(ROOT_DIR, "data", "tunisian_apartments_geo_final_130.csv")
-METRICS_JSON = os.path.join(ROOT_DIR, "data", "metrics.json")
 RUN_LOG      = os.path.join(ROOT_DIR, "data", "run_log.csv")
 
-# run_log.csv column order — never change this or old rows become misaligned
+# MLflow tracking
+TRACKING_URI = f"sqlite:///{os.path.join(ROOT_DIR, 'mlflow.db')}"
+EXPERIMENT_NAME = "tunisian-apartment"
+
+# run_log.csv column order — never change this
 LOG_COLUMNS = [
     "run_timestamp",
     "raw_rows",
@@ -66,32 +55,45 @@ def _count_csv_rows(path: str) -> int:
     if not os.path.exists(path):
         return 0
     with open(path, "r", encoding="utf-8-sig") as f:
-        return sum(1 for _ in f) - 1   # subtract header line
+        return sum(1 for _ in f) - 1
 
 
 def _load_metrics() -> dict:
     """
-    Load metrics written by 02_Modeling.ipynb.
-
-    02_Modeling.ipynb saves a metrics.json file at the end of
-    Section 19 (Model Comparison). The file has this structure:
-
-    {
-      "best_model":    "Ridge (Tuned)",
-      "r2":            0.7701,
-      "rmse":          0.2781,
-      "mae":           0.2017,
-      "avg_error_pct": 22.4
-    }
-
-    If the file doesn't exist (notebook didn't finish or wasn't
-    updated yet), we return empty defaults so the log row still
-    gets written with whatever info is available.
+    Load the best metrics directly from the MLflow database.
+    This creates a Single Source of Truth and bypasses the 
+    outdated metrics.json file completely.
     """
-    if not os.path.exists(METRICS_JSON):
-        print(f"  ⚠ metrics.json not found at: {METRICS_JSON}")
-        print("    Make sure 02_Modeling.ipynb writes metrics.json.")
-        print("    Logging with empty metric values.")
+    try:
+        from mlflow.tracking import MlflowClient
+        client = MlflowClient(tracking_uri=TRACKING_URI)
+        experiment = client.get_experiment_by_name(EXPERIMENT_NAME)
+        
+        if experiment is None:
+            raise ValueError(f"Experiment '{EXPERIMENT_NAME}' not found.")
+            
+        # Search for the absolutely best run (highest r2)
+        runs = client.search_runs(
+            experiment_ids=[experiment.experiment_id],
+            order_by=["metrics.r2 DESC"],
+            max_results=1,
+        )
+        
+        if not runs:
+            raise ValueError("No runs found in MLflow.")
+            
+        best_run = runs[0]
+        
+        return {
+            "best_model":    best_run.data.tags.get("mlflow.runName", "Unknown Model"),
+            "r2":            round(best_run.data.metrics.get("r2", 0), 4),
+            "rmse":          round(best_run.data.metrics.get("rmse", 0), 4),
+            "mae":           round(best_run.data.metrics.get("mae", 0), 4),
+            "avg_error_pct": round(best_run.data.metrics.get("avg_error_pct", 0), 2),
+        }
+    except Exception as e:
+        print(f"  ⚠ Could not fetch metrics from MLflow: {e}")
+        print("  ⚠ Logging with empty metric values.")
         return {
             "best_model":    "unknown",
             "r2":            None,
@@ -99,8 +101,6 @@ def _load_metrics() -> dict:
             "mae":           None,
             "avg_error_pct": None,
         }
-    with open(METRICS_JSON, "r", encoding="utf-8") as f:
-        return json.load(f)
 
 
 def _ensure_log_header():
@@ -114,16 +114,7 @@ def _ensure_log_header():
 
 
 def write_run_report(new_rows: int = 0, total_runtime_s: float = 0.0) -> dict:
-    """
-    Append one row to run_log.csv summarising this pipeline run.
-
-    Args:
-        new_rows        : Number of new rows added by incremental_scrape.py.
-        total_runtime_s : Wall-clock seconds for the full pipeline run.
-
-    Returns:
-        The dict that was written, for inspection by the caller.
-    """
+    """Append one row to run_log.csv summarising this pipeline run."""
     print("\n" + "=" * 55)
     print("  STEP 5 — Write Run Report")
     print("=" * 55)
@@ -164,10 +155,5 @@ def write_run_report(new_rows: int = 0, total_runtime_s: float = 0.0) -> dict:
 
     return row
 
-
-# ── Standalone run ─────────────────────────────────────────────────────────────
-
 if __name__ == "__main__":
-    # When run standalone, report with zero new rows and zero runtime
-    # (useful for testing the log writing logic)
     write_run_report(new_rows=0, total_runtime_s=0.0)

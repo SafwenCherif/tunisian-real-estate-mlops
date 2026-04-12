@@ -19,6 +19,7 @@ stages:
       # Final model and metrics
       - data/latest_model.pkl
       - data/metrics.json
+      - data/scaler.pkl
 
   # STAGE 2: Evaluation & Promotion (MLflow Integration)
   # DVC only runs this if the metrics.json changes (meaning a new model was trained)
