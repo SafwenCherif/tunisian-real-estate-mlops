@@ -842,49 +842,7 @@ def main():
             else:
                 st.caption("No amenities selected.")
 
-        # Upgrade simulator
-        st.markdown("#### 💰 Upgrade value simulator")
-        st.caption("How much would each addition be worth for this property?")
 
-        with st.spinner("Simulating upgrades…"):
-            upgrade_results, _ = simulate_upgrades(inp, model, feature_cols, scaler)
-
-        for label, delta, already in upgrade_results:
-            if already:
-                st.markdown(
-                    f'<div class="upgrade-row">'
-                    f'<span>✅ {label}</span>'
-                    f'<span class="upgrade-neutral">Already included</span>'
-                    f'</div>',
-                    unsafe_allow_html=True,
-                )
-            else:
-                delta_str = f"+{fmt_tnd(delta)}" if delta >= 0 else f"−{fmt_tnd(abs(delta))}"
-                color     = "#27ae60" if delta >= 0 else "#e74c3c"
-                st.markdown(
-                    f'<div class="upgrade-row">'
-                    f'<span>➕ {label}</span>'
-                    f'<span style="font-family:\'IBM Plex Mono\',monospace;'
-                    f'font-weight:500;color:{color};">{delta_str}</span>'
-                    f'</div>',
-                    unsafe_allow_html=True,
-                )
-
-        # MLflow model info footer
-        st.markdown("<br>", unsafe_allow_html=True)
-        if info["model_version"] != "—":
-            st.caption(
-                f"🤖 Active model: **{info['model_name']}** "
-                f"(registry v{info['model_version']})"
-            )
-
-        st.caption(
-            f"⚠️ **Disclaimer:** This estimate is produced by a **{model_label}** model "
-            "trained on scraped mubawab.tn listings. It is for informational purposes only "
-            "and does not constitute a professional property valuation. "
-            "Accuracy is highest for properties in the 100,000–800,000 TND range in "
-            "Greater Tunis, Hammamet, and Sousse."
-        )
 
 
 # ─────────────────────────────────────────────────────────────────────────────
