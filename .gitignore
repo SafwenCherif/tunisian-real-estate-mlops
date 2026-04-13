@@ -36,6 +36,6 @@ airflow-webserver.pid
 .dvc/cache/
 .dvc/gdrive_credentials.json.bak
 
-venv
+venv/
 
 tunisian_apartments_geo_final_130.csv
