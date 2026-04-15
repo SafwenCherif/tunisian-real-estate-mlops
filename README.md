@@ -4,7 +4,7 @@
 
 **Data source:** [mubawab.tn](https://www.mubawab.tn/fr/sc/appartements-a-vendre)  
 **Target:** Apartment sale prices in TND (Tunisian Dinar)  
-**Champion model:** Ridge Regression — R² ≈ 0.77 · average error ±22%  
+**Champion model:** Ridge Regression — R² ≈ 0.77 · average error ±22%  (Can be changed if the data changes)
 **Stack:** Python · Airflow · DVC · MLflow · Docker · Scikit-learn · BeautifulSoup · Geopy · Nominatim
 
 ---
@@ -1134,7 +1134,3 @@ Both tree models agree: `LotArea` alone accounts for ~50% of splitting power. Th
 ### What an R² of 0.77 means in practice
 
 The model explains 77% of the variance in Tunisian apartment prices. The remaining 23% is driven by factors not captured in the scraped data: seller urgency, interior photo quality, building reputation, unrecorded renovations, floor plan layout, number of parking spots. For a market with no official transaction records (Tunisia has no Multiple Listing Service equivalent), this is a strong baseline. Professional real estate appraisers in comparable markets operate with ±15–25% error ranges.
-
----
-
-*Project completed: March 2026. Pipeline running in production via Docker on local infrastructure.*
