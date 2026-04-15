@@ -10,7 +10,6 @@
 ---
 
 ## Table of contents
-
 1. [Project overview](#1-project-overview)
 2. [Repository structure](#2-repository-structure)
 3. [Architecture — the four layers](#3-architecture--the-four-layers)
